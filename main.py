@@ -1,44 +1,35 @@
-"""
-Web Scraping TMDB with tmdbsimple
-"""
+import pickle
+with open('raw_docs.pkl', 'rb') as f:
+    raw_docs = pickle.load(f)
 
-import tmdbsimple as tmdb
+# print(raw_docs)
 
-# Set the API key
-tmdb.API_KEY = '' # REMEMBER TO CHANGE THIS WHEN YOU PUSH TO GITHUB
+from MovieClasses import MvDoc 
+import datetime
 
-# List to store raw data
-raw_docs = []
-
-# Since the API only gets 20 movies per page, we need to loop through the pages
-nbMovies = 100
-nbPerPage = 20
-pages = (nbMovies // nbPerPage) + (1 if nbMovies % nbPerPage > 0 else 0) # Add 1 if there is a remainder
-
-# Loop through the trending page
-trending = tmdb.Trending(media_type='movie', time_window='week') # Weekly trending movies
-for page in range(1, pages +1):
-    response = trending.info(page=page)
-    for movie in response['results']:
-        if len(raw_docs) < nbMovies: # If the number of movies needed is not yet reached
-            # Now extract the details for the movie
-            metadata = {
-                'title': movie.get('title', 'Unknown'), # Movie title (default to 'Unknown' if not found)
-                'rating': movie.get('vote_average', 'N/A'), # Movie rating (default to 'N/A' if not found)
-                'Synopsis': movie.get('overview', 'No Synopsis'),
-                'release_date': movie.get('release_date', 'Unknown'), 
-                'runtime': None # Placeholder for now. Have to get this from another API call
-            }
-
-            # Runtime fetch (since it's not in the trending API)
-            movie_info = tmdb.Movies(movie['id']).info()
-            metadata['runtime'] = movie_info.get('runtime', 'N/A')
-
-            # Append the metadata to the raw_docs list
-            raw_docs.append(metadata)
-
-
-# Print the raw data
-print(f'Fetched {len(raw_docs)} movies:')
+collection = []
 for doc in raw_docs:
-    print(doc)
+    title = doc['title']
+    director = doc['Director']
+    rating = f'{doc["rating"]:.2f} out of 10' # cut the rating to 2 decimal places
+    synopsis = doc['Synopsis']
+    release_date = datetime.datetime.strptime(doc['release_date'], '%Y-%m-%d').strftime('%B %d, %Y') # format the date to real date time format
+    runtime = f'{doc["runtime"]//60}h {doc["runtime"]%60}m' #convert runtime to hours and minutes
+
+    mv = MvDoc(title,director,rating, synopsis, release_date, runtime)
+    collection.append(mv)
+
+# print(collection)
+from MovieClasses import Director
+
+id2mv = {} # Dictionary to store movies with their IDs ( Key: ID, Value: Movie object)
+for i, movie in enumerate(collection):
+    id2mv[i] = movie
+
+id2dir = {} # Dictionary to store directors with their IDs ( Key: ID, Value: Director object)
+for movie in collection:
+    if movie.director not in id2dir:
+        id2dir[movie.director] = Director(movie.director)
+    id2dir[movie.director].add(movie.title)
+
+print(id2dir.values())
