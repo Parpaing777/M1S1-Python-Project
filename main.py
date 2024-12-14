@@ -1,10 +1,10 @@
 import pickle
-with open('raw_docs.pkl', 'rb') as f:
+with open('raw_docs_300.pkl', 'rb') as f:
     raw_docs = pickle.load(f)
 
 # print(raw_docs)
 
-from MovieClasses import MvDoc 
+from MovieClasses import MvDoc, Director
 import datetime
 
 collection = []
@@ -20,16 +20,27 @@ for doc in raw_docs:
     collection.append(mv)
 
 # print(collection)
-from MovieClasses import Director
 
-id2mv = {} # Dictionary to store movies with their IDs ( Key: ID, Value: Movie object)
+
+id2mv = {} # Dictionary to store movies with their IDs ( Key: ID, Value: Movie title)
 for i, movie in enumerate(collection):
-    id2mv[i] = movie
+    id2mv[i] = movie.title
 
-id2dir = {} # Dictionary to store directors with their IDs ( Key: ID, Value: Director object)
-for movie in collection:
+id2dir = {} # Dict to group movies by Directors (Key: Director name, Value: Director object)
+for i, movie in enumerate (collection):
     if movie.director not in id2dir:
         id2dir[movie.director] = Director(movie.director)
-    id2dir[movie.director].add(movie.title)
+    id2dir[movie.director].add(id2mv[i])
 
-print(id2dir.values())
+# print(id2dir)
+
+from Corpus import MvCorpus as mc
+
+corpus = mc('Top 300 Movies')
+for movie in collection:
+    corpus.add(movie)
+
+# corpus.show(20, 'title') 
+# print(corpus)
+corpus.PKLsave('Corpus_Top300')
+# corpus.PDsave('Corpus_Top300')

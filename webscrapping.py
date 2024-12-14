@@ -12,14 +12,19 @@ tmdb.API_KEY = 'SECRET KEY' # REMEMBER TO CHANGE THIS WHEN YOU PUSH TO GITHUB
 raw_docs = []
 
 # Since the API only gets 20 movies per page, we need to loop through the pages
-nbMovies = 100
-nbPerPage = 20
+nbMovies = 300 # Number of movies to fetch 
+nbPerPage = 20 # Number of movies per page (fixed by the API)
 pages = (nbMovies // nbPerPage) + (1 if nbMovies % nbPerPage > 0 else 0) # Add 1 if there is a remainder
 
 # Loop through the trending page
-trending = tmdb.Trending(media_type='movie', time_window='week') # Weekly trending movies
+# trending = tmdb.Trending(media_type='movie', time_window='week') # Weekly trending movies
+
+# Loop through top rated page
+top_rated = tmdb.Movies() # Top rated movies
+
 for page in tqdm(range(1, pages +1)):
-    response = trending.info(page=page)
+    # response = trending.info(page=page)
+    response = top_rated.top_rated(page=page)
     for movie in response['results']:
         if len(raw_docs) < nbMovies: # If the number of movies needed is not yet reached
             # Now extract the details for the movie
@@ -47,6 +52,6 @@ for page in tqdm(range(1, pages +1)):
             raw_docs.append(metadata)
 
 
-
-with open('raw_docs.pkl', 'wb') as f:
+# Save the raw data to a pickle file for later use
+with open('raw_docs_300.pkl', 'wb') as f:
     pickle.dump(raw_docs, f)
