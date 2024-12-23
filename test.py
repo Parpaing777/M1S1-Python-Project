@@ -1,6 +1,5 @@
-import Corpus
+from Corpus import MdCorpus as mdc
 
-corpus = Corpus.MvCorpus('Top 300 Movies')
-corpus.PDload('Corpus_Top300')
+corpus = mdc('test').PKLload('10MvSeries')
 
 print(corpus)
