@@ -22,6 +22,9 @@ class MvDoc:
     def __repr__(self):
         return f'Title:{self.title}\t\nDirector:{self.director}\t\nRating:{self.rating}\t\nSynopsis:{self.synopsis[:50]}...\t\nRelease Date:{self.release_date}\t\nRuntime:{self.runtime}\t\n'
     
+    def getType(self):
+        return self.type
+        
 class Director:
     """
     Class for Directors and their bibliography

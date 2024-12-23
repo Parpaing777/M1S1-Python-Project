@@ -70,12 +70,12 @@ for i, media in enumerate(collection):
 
 from Corpus import MdCorpus as mdc
 
-corpus = mdc('55MvSeries')
+corpus = mdc('300MvTv')
 for media in collection:
     corpus.addMedia(media)
 
-corpus.show(10, 'title')
-corpus.PKLsave('10MvSeries')
+# corpus.show(20, 'title')
+corpus.PKLsave('300MVTV')
 
 
 
