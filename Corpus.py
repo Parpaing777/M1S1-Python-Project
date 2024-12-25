@@ -5,6 +5,7 @@ import pandas as pd
 import pickle
 from MovieClasses import MvDoc, Director, SeriDoc, Creator
 import datetime
+import re
 
 class MdCorpus:
     """
@@ -95,3 +96,50 @@ class MdCorpus:
             corpus =  pickle.load(f)
         print(f'Corpus loaded from {filename}.pkl')
         return corpus
+    
+    def SynoSearch(self, pattern):
+        """
+        Method to search keywords in the synopsis of the movies/TV series
+        """
+        try: #check if the string of all synopsis is available
+            texts = self.allSyno
+        except: #if not, build the string
+            self.allSyno = ' '.join ([media.synopsis for media in self.id2Med.values()])
+            texts = self.allSyno
+
+        pattern = re.compile(pattern, re.IGNORECASE) # Compile the pattern and ignore case
+        # Search for the pattern in the text string
+        results = pattern.finditer(texts)
+        # Get the start pos of the pattern in the text
+        startPos = [match.start() for match in results]
+        # Print the results
+        print(f'{len(startPos)} results found')
+        # Return the passages where the pattern was found as a list
+        return[texts[i-20:i+20] for i in startPos]
+    
+    def concorde(self, pattern, context_size=20):
+        """
+        Similar method to the SynoSearch but returns a pandas dataframe
+        """
+        try:
+            texts = self.allSyno
+        except:
+            self.allSyno = ' '.join([media.synopsis for media in self.id2Med.values()])
+            texts = self.allSyno
+        
+        pattern = re.compile(pattern, re.IGNORECASE)
+
+        results = pattern.finditer(texts)
+        startPos = [match.span() for match in results]
+
+        context_left = []
+        context_right = []
+        motif_found = []
+
+        for i,j in startPos:
+            context_left.append(texts[i-context_size:i])
+            motif_found.append(texts[i:j])
+            context_right.append(texts[j:j+context_size])
+
+        df = pd.DataFrame({'Left Context': context_left, 'Pattern': motif_found, 'Right Context': context_right})
+        return df
