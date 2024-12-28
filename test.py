@@ -4,4 +4,10 @@ corpus = mdc('test').PKLload('300MVTV')
 
 # print(corpus.concorde('Tarantino'))
 # corpus.vocabularize()
-corpus.stats()
+# print(corpus.Search('Vampire'))
+
+from searchEngine import SearchEngine as se
+
+search = se(corpus)
+
+print(search.search('Tarantino'))
