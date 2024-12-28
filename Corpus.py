@@ -97,16 +97,22 @@ class MdCorpus:
         print(f'Corpus loaded from {filename}.pkl')
         return corpus
     
-    def SynoSearch(self, pattern):
+    def get_textData(self):
         """
-        Method to search keywords in the synopsis of the movies/TV series
+        Method to get useful text data from the corpus
+        (Title, Director/Creator, Synopsis)
         """
-        try: #check if the string of all synopsis is available
-            texts = self.allSyno
-        except: #if not, build the string
-            self.allSyno = ' '.join ([media.synopsis for media in self.id2Med.values()])
-            texts = self.allSyno
+        try:
+            return self.allText
+        except:
+            self.allText = ' '.join([media.title + ' ' + (media.director if media.type == 'Movie' else media.creator) + ' ' + media.synopsis for media in self.id2Med.values()])
+            return self.allText
 
+    def Search(self, pattern):
+        """
+        Method to search keywords in the movies/TV series
+        """
+        texts = self.get_textData()
         pattern = re.compile(pattern, re.IGNORECASE) # Compile the pattern and ignore case
         # Search for the pattern in the text string
         results = pattern.finditer(texts)
@@ -119,14 +125,9 @@ class MdCorpus:
     
     def concorde(self, pattern, context_size=20):
         """
-        Similar method to the SynoSearch but returns a pandas dataframe
+        Similar method to the Search but returns a pandas dataframe
         """
-        try:
-            texts = self.allSyno
-        except:
-            self.allSyno = ' '.join([media.synopsis for media in self.id2Med.values()])
-            texts = self.allSyno
-        
+        texts = self.get_textData()
         pattern = re.compile(pattern, re.IGNORECASE)
 
         results = pattern.finditer(texts)
@@ -143,3 +144,50 @@ class MdCorpus:
 
         df = pd.DataFrame({'Left Context': context_left, 'Pattern': motif_found, 'Right Context': context_right})
         return df
+
+    def clean_text(self, text):
+        """
+        Simple method to clean text 
+        """
+        text = text.lower()
+        text = re.sub(r'[^\w\s]', '', text)
+        text = re.sub(r'\n', ' ', text)
+        return text
+    
+    def vocabularize(self):
+        """
+        Method to build a vocabulary dictionary from the text data
+        """
+        texts = self.get_textData()
+        # Clean the text
+        texts = self.clean_text(texts)
+        # Split the text into words (tokenization)
+        words = texts.split()
+        # Build the vocabulary dictionary
+        self.vocab = {}
+        # Stock the split words in the dictionary. But pass by the set to avoid duplicates
+        for word in set(words):
+            self.vocab[word] = words.count(word)
+        return self.vocab
+    
+    def stats(self, nreturn=10):
+        """
+        Method to display total number of words in the Vocabulary and the most frequent words
+        """
+        # Get the text data
+        text_data = self.get_textData()
+        
+        # Split the text data into words and clean the text
+        words = self.clean_text(text_data)
+        words = re.sub(r'[^\w\s]', '', text_data).split()
+        
+        # Calculate word frequencies
+        word_freq = pd.Series(words).value_counts()
+        
+        # Print the total number of words and the most frequent words
+        print(f'Total number of words in the Vocabulary: {len(words)}')
+        print(f'The {nreturn} most frequent words are:')
+        print(word_freq.head(nreturn).index.tolist())
+        
+        return word_freq.to_dict()
+
