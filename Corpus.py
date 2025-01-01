@@ -190,4 +190,3 @@ class MdCorpus:
         print(word_freq.head(nreturn).index.tolist())
         
         return word_freq.to_dict()
-

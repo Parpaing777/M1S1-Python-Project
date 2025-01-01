@@ -1,4 +1,4 @@
-######### TEST FILE BEFORE IMPLEMENTING AS A CLASS#######
+######### PROTOTYPE FILE FOR SEARCH ENGINE BEFORE IMPLEMENTING AS A CLASS#######
 import numpy as np
 import scipy as sp
 import pandas as pd
@@ -28,8 +28,8 @@ def deep_clean( doc):
     # remove tokens that are not alphabetic
     tokens = [word for word in tokens if word.isalpha()]
     # fliter stop words (english)
-    # stop_words = set(stopwords.words('english'))
-    # tokens = [word for word in tokens if not word in stop_words]
+    stop_words = set(stopwords.words('english'))
+    tokens = [word for word in tokens if not word in stop_words]
     # filter tokens with one character
     tokens = [word for word in tokens if len(word) > 1]
     # stemming words
@@ -41,7 +41,7 @@ Vocab = {}
 
 for text in corpus.id2Med.values():
     texts = text.title + ' ' + (text.director if text.type == 'Movie' else text.creator) + ' ' + text.synopsis
-    texts = simple_clean(texts)
+    texts = deep_clean(texts)
     for word in texts.split():
         if word not in Vocab:
             Vocab[word] = {"UniqueID":len(Vocab), "Occurences":1}
@@ -56,7 +56,7 @@ data = []
 # We have to add index values to the rows list, UniqueID to the columns list and Occurences to the data list
 for id, text in enumerate(corpus.id2Med.values()):
     texts = text.title + ' ' + (text.director if text.type == 'Movie' else text.creator) + ' ' + text.synopsis
-    texts = simple_clean(texts)
+    texts = deep_clean(texts)
     for word in texts.split():
         if word in Vocab:
             rows.append(id)
@@ -96,7 +96,7 @@ mat_TFxIDF = mat_TFxIDF.tocsr()
 
 def search(mat_TFxIDF,Vocab):
     query = input('Enter your search query: ')
-    query = simple_clean(query)
+    query = deep_clean(query)
     # Create a vector for the query
     query_vector = np.zeros(len(Vocab))
     # Fill the query vector

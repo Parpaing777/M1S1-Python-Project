@@ -1,5 +1,5 @@
 """
-Web Scraping TMDB with tmdbsimple
+This script scrapes the movies and TV shows from TMDB's TOP RATED list using the tmdbsimple API.
 """
 import tmdbsimple as tmdb
 import pickle
@@ -10,11 +10,6 @@ tmdb.API_KEY = 'API Secret' # REMEMBER TO CHANGE THIS WHEN YOU PUSH TO GITHUB
 
 # List to store raw data
 raw_docs = []
-
-# Since the API only gets 20 movies per page, we need to loop through the pages
-nbMovies = 5 # Number of movies to fetch 
-nbTV = 5 # Number of TV shows to fetch
-
 
 # Helper function to get the metadata for movies and TV shows
 def get_metadata(item, media_type):
@@ -85,6 +80,9 @@ def scrape_tmdb(media_type, nbItems):
 
     return items
 
+# Since the API only gets 20 movies per page, we need to loop through the pages
+nbMovies = 300 # Number of movies to fetch 
+nbTV = 300 # Number of TV shows to fetch
 # Fetching movies
 raw_movies = scrape_tmdb('movie', nbMovies)
 raw_TV = scrape_tmdb('tv', nbTV)
@@ -92,6 +90,6 @@ raw_TV = scrape_tmdb('tv', nbTV)
 raw_docs = raw_movies + raw_TV
 
 # Save the raw data to a pickle file for later use
-with open('raw_MVTV_300.pkl', 'wb') as f:
+with open('raw_MVTV_600.pkl', 'wb') as f:
     pickle.dump(raw_docs, f)
 

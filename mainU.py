@@ -1,5 +1,8 @@
+"""
+This script is used to load the raw scrapped data from the pickle file, create a collection of Movie and TV series and save it as a corpus.
+"""
 import pickle
-with open('raw_MVTV_300.pkl', 'rb') as f:
+with open('raw_MVTV_600.pkl', 'rb') as f:
     raw_docs = pickle.load(f)
 
 # print(raw_docs)
@@ -70,12 +73,13 @@ for i, media in enumerate(collection):
 
 from Corpus import MdCorpus as mdc
 
-corpus = mdc('300MvTv')
+corpus = mdc('600MvTv')
 for media in collection:
     corpus.addMedia(media)
 
 # corpus.show(20, 'title')
-corpus.PKLsave('300MVTV')
+corpus.PKLsave('600MVTV')
+
 
 
 

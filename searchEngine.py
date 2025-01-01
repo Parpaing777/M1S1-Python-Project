@@ -1,8 +1,13 @@
+"""
+Search Engine class for the media corpus
+"""
 import numpy as np
 import scipy as sp
 import pandas as pd
 import re
 from tqdm import tqdm
+import string
+from nltk.corpus import stopwords
 
 class SearchEngine:
     """
@@ -24,10 +29,31 @@ class SearchEngine:
         text = re.sub(r'\n', ' ', text)
         return text
     
+    def __deep_clean(self,doc):
+        """
+        More complex method to clean the text (removes stopwords, punctuations, single characters)
+        """
+        # split into tokens by white space
+        tokens = doc.split()
+        # prepare regex for char filtering
+        re_punc = re.compile('[%s]' % re.escape(string.punctuation))
+        # remove punctuation from each word
+        tokens = [re_punc.sub('',word) for word in tokens]
+        # remove tokens that are not alphabetic
+        tokens = [word for word in tokens if word.isalpha()]
+        # fliter stop words (english)
+        stop_words = set(stopwords.words('english'))
+        tokens = [word for word in tokens if not word in stop_words]
+        # filter tokens with one character
+        tokens = [word for word in tokens if len(word) > 1]
+        # create a continuous string to return
+        cleaned = ' '.join(tokens)
+        return cleaned
+
     def create_matrix(self,corpus,Vocab):
         for media in corpus.id2Med.values():
             doc = media.title + ' ' + (media.director if media.type == 'Movie' else media.creator) + ' ' + media.synopsis
-            doc = self.__simple_clean(doc)
+            doc = self.__deep_clean(doc)
             for word in doc.split():
                 if word not in Vocab:
                     Vocab[word] = {"UniqueID":len(Vocab), "Occurences":1}
@@ -40,7 +66,7 @@ class SearchEngine:
 
         for id, media in enumerate(corpus.id2Med.values()):
             doc = media.title + ' ' +  (media.director if media.type == 'Movie' else media.creator) + ' ' + media.synopsis
-            doc = self.__simple_clean(doc)
+            doc = self.__deep_clean(doc)
             for word in doc.split():
                 if word in Vocab:
                     rows.append(id)
@@ -63,7 +89,7 @@ class SearchEngine:
         self.mat_TFxIDF = self.mat_TFxIDF.tocsr()
 
     def search(self, query):
-        query = self.__simple_clean(query)
+        query = self.__deep_clean(query)
         query_vector = np.zeros(len(self.Vocab))
 
         for word in query.split():
