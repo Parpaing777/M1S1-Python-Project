@@ -4,16 +4,8 @@ import subprocess
 
 def show_main_menu():
     clear_window()
-    tk.Button(root, text='Process Corpus', command=process_corpus).pack(pady=30)
     tk.Button(root, text='Search Engine', command=show_search_engine).pack(pady=30)
     tk.Button(root, text='Exit', command=root.quit).pack(pady=10, side='bottom')
-
-def process_corpus():
-    try:
-        subprocess.run(['python', 'mainU.py'])
-        messagebox.showinfo('Info', 'Corpus Processed Successfully')
-    except Exception as e:
-        messagebox.showerror('Error', f'Error: {e}')
 
 def show_search_engine():
     clear_window()
@@ -43,6 +35,7 @@ def show_search_engine():
         # Update window to show progress bar
         results_window.update()
 
+        # Progress callback for showing the progress bar(linked with the progress_callback in searchEngine.py)
         def progress_callback(current, total):
             progress = (current / total) * 100
             progress_bar['value'] = progress
