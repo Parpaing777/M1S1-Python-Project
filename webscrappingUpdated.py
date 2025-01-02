@@ -92,4 +92,3 @@ raw_docs = raw_movies + raw_TV
 # Save the raw data to a pickle file for later use
 with open('raw_MVTV_600.pkl', 'wb') as f:
     pickle.dump(raw_docs, f)
-

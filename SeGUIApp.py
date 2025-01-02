@@ -1,3 +1,8 @@
+"""
+GUI Application for the search engine. 
+/!\ IT IS RECOMMENDED TO INSTALL TKINTER USING THE FOLLOWING COMMAND: `sudo apt-get install python3-tk` BEFORE RUNNING THIS SCRIPT
+
+"""
 import tkinter as tk
 from tkinter import messagebox,ttk
 import subprocess
@@ -82,5 +87,3 @@ root.title('Movie Database')
 root.geometry('400x400')
 show_main_menu()
 root.mainloop()
-    
-
