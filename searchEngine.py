@@ -88,7 +88,7 @@ class SearchEngine:
         self.mat_TFxIDF = self.mat_TF.multiply(idf_values)
         self.mat_TFxIDF = self.mat_TFxIDF.tocsr()
 
-    def search(self, query):
+    def search(self, query, progress_callback=None, limit=10):
         query = self.__deep_clean(query)
         query_vector = np.zeros(len(self.Vocab))
 
@@ -108,13 +108,22 @@ class SearchEngine:
             if doc_norm != 0:
                 cos_sim[i] = np.array(self.mat_TFxIDF[i, :].todense()).flatten().dot(query_vector) / (doc_norm * query_norm)
         
+            # Progress callback
+            if progress_callback:
+                progress_callback(i, len(doc_norms))
+
         valid_indices = np.where(cos_sim > 0.00)[0]
         res = []
         medKeys = list(self.corpus.id2Med.keys())
+        count = 0 # counter to track the number of results and the limit
         for i in valid_indices:
+            if count >= limit:
+                break
             title = self.corpus.id2Med[medKeys[i]].title
             text = self.corpus.id2Med[medKeys[i]].synopsis
             res.append([medKeys[i],title,text,cos_sim[i]])
+            count += 1
+            
         res = sorted(res, key=lambda x: x[3], reverse=True)
         return pd.DataFrame(res, columns=['ID','Title','Synopsis','Cosine Similarity'])
 
