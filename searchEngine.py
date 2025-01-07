@@ -46,6 +46,8 @@ class SearchEngine:
         tokens = [word for word in tokens if not word in stop_words]
         # filter tokens with one character
         tokens = [word for word in tokens if len(word) > 1]
+        # lower case
+        tokens = [word.lower() for word in tokens]
         # create a continuous string to return
         cleaned = ' '.join(tokens)
         return cleaned
