@@ -37,6 +37,8 @@ class SearchEngine:
         tokens = doc.split()
         # prepare regex for char filtering
         re_punc = re.compile('[%s]' % re.escape(string.punctuation))
+        # lower case
+        tokens = [word.lower() for word in tokens]
         # remove punctuation from each word
         tokens = [re_punc.sub('',word) for word in tokens]
         # remove tokens that are not alphabetic
@@ -46,8 +48,6 @@ class SearchEngine:
         tokens = [word for word in tokens if not word in stop_words]
         # filter tokens with one character
         tokens = [word for word in tokens if len(word) > 1]
-        # lower case
-        tokens = [word.lower() for word in tokens]
         # create a continuous string to return
         cleaned = ' '.join(tokens)
         return cleaned
