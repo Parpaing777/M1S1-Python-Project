@@ -179,7 +179,7 @@ class MdCorpus:
         
         # Split the text data into words and clean the text
         words = self.clean_text(text_data)
-        words = re.sub(r'[^\w\s]', '', text_data).split()
+        words = words.split()
         
         # Calculate word frequencies
         word_freq = pd.Series(words).value_counts()
