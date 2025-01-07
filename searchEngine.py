@@ -9,6 +9,10 @@ from tqdm import tqdm
 import string
 from nltk.corpus import stopwords
 
+# download the stopwords
+import nltk
+nltk.download('stopwords', quiet=True)
+
 class SearchEngine:
     """
     A search engine class for the media corpus
